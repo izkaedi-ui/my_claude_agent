@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tripo Prompt Lab — Empirical Geometry Prompt Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header>
+    <div class="brand">
+      <h1>TRIPO <span>PROMPT LAB</span></h1>
+      <p>Empirical geometry operating system for Tripo 3D generator</p>
+    </div>
+    
+    <!-- Mode Toggles and Wizard Triggers -->
+    <div class="header-controls">
+      <div class="ui-mode-toggle">
+        <button id="modeBeginnerBtn" class="btn-mode active">Beginner</button>
+        <button id="modeExpertBtn" class="btn-mode">Expert</button>
+      </div>
+      <button id="openWizardBtn" class="btn btn-wizard" title="Plain-English text intent wizard">🪄 Wizard</button>
+      <button id="openCompareBtn" class="btn btn-compare" title="Side-by-side prompt comparison">⚖️ Compare</button>
+      <button id="openGalleryBtn" class="btn btn-wizard" title="View uploaded screenshots">🖼️ Gallery</button>
+      <button id="openTreeBtn" class="btn btn-wizard" title="View variant lineage tree">🌳 Tree</button>
+      <button id="openExperimentBtn" class="btn btn-wizard" title="Run scaling experiments">🔬 Experiment</button>
+      <button id="openShelfBtn" class="btn btn-wizard" title="View thematic families">📚 Shelf</button>
+      <button id="exportProjectBtn" class="btn btn-discovery" title="Export research JSON backup">📥 Export JSON</button>
+      <button id="exportReportBtn" class="btn btn-discovery" title="Export Markdown research report">📝 Report</button>
+      <input type="file" id="importProjectFile" style="display: none;" accept=".json">
+      <button id="importProjectBtn" class="btn btn-discovery" title="Import research JSON backup">📤 Import</button>
+    </div>
+    
+    <div class="header-status">
+      <span class="status-label">System Integrity:</span>
+      <div id="statusBadge" class="status-badge status-optimal">OPTIMAL</div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- LEFT PANEL: CONFIGURATION SELECTORS -->
+    <section class="panel">
+      <h2 class="panel-title">1. CONFIGURATION <span class="sub-label">Intent Parameters</span></h2>
+      
+      <!-- Preset Select -->
+      <div class="form-group">
+        <label for="presetSelect">User Preset</label>
+        <select id="presetSelect">
+          <option value="balanced" selected>Manual / Custom</option>
+          <option value="fastPreview">Fast Preview (2k Cap)</option>
+          <option value="gameAsset">Game Asset (10k Cap)</option>
+          <option value="heroAsset">Hero Asset (20k Cap)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="categorySelect">Asset Category</label>
+        <select id="categorySelect"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="subjectSelect">Subject</label>
+        <select id="subjectSelect"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="silhouetteSelect">Silhouette Profile</label>
+        <select id="silhouetteSelect"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="materialSelect">Primary Material</label>
+        <select id="materialSelect"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="triangleCapSelect">Triangle Cap</label>
+        <select id="triangleCapSelect"></select>
+      </div>
+
+      <!-- Advanced topology and density panel -->
+      <div id="advancedControlsPanel">
+        <div class="form-group">
+          <label for="topologySelect">Topology Mode</label>
+          <select id="topologySelect"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="detailDensitySlider">Detail Density</label>
+          <div class="slider-container">
+            <input type="range" id="detailDensitySlider" min="0" max="100" value="75">
+            <span id="detailDensityVal" class="slider-val">75%</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="styleSelect">Style Tag</label>
+          <select id="styleSelect"></select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="productionSelect">Production Target</label>
+        <select id="productionSelect"></select>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: PROMPT WORKSPACE -->
+    <section class="center-panel">
+      
+      <div class="panel" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+        <div class="panel-title-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <h2 class="panel-title" style="margin-bottom: 0; border: none; padding-bottom: 0;">2. GENERATED OUTPUT</h2>
+          <div class="output-panel-controls" style="display: flex; gap: 0.4rem; align-items: center;">
+            <button id="randomDiscoveryBtn" class="btn-toggle-view" title="Roll random S-tier geometry configs">🎲 Discovery</button>
+            <button id="bulkDiscoveryBtn" class="btn-toggle-view" title="Generate a bulk batch of 10 random valid prompts">🎲 Bulk Batch</button>
+            <button id="autoPilotBtn" class="btn-toggle-view" title="Toggle periodic auto-prompt generation every 5s">🤖 Auto-Pilot: OFF</button>
+            <button id="toggleViewBtn" class="btn-toggle-view">TAG VIEW</button>
+          </div>
+        </div>
+        
+        <div class="prompt-output-container" id="promptOutput">
+          <textarea id="promptTextBox" class="prompt-textarea" readonly></textarea>
+          <!-- Colored Tag View Overlay -->
+          <div id="coloredPromptView" class="colored-prompt-view" style="display: none;"></div>
+          
+          <div class="prompt-metrics">
+            <span id="charCountVal" class="char-count">0</span>
+            <span id="maxCharLimit" class="char-limit">/ 250 Chars</span>
+          </div>
+        </div>
+        <button id="generateButton" style="display: none;"></button>
+
+        <div class="actions-row">
+          <!-- Copy Dropdown format -->
+          <div class="copy-dropdown-container">
+            <select id="copyFormatSelect" class="copy-format-select">
+              <option value="clean">Clean Prompt</option>
+              <option value="annotated">Annotated Prompt</option>
+              <option value="json">JSON Config</option>
+              <option value="markdown">Markdown Block</option>
+            </select>
+            <button id="copyButton" class="btn btn-primary">
+              Copy Output
+            </button>
+          </div>
+          <button id="resetButton" class="btn btn-secondary">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Mutators / Evoltutors Section -->
+      <div class="panel">
+        <h2 class="panel-title">3. MUTATION ENGINE <span class="sub-label">Prompt Mutation Chain</span></h2>
+        <div class="mutator-section">
+          <div class="slider-container" style="margin-bottom: 0.5rem;">
+            <label style="flex: 1;">Mutation Strength:</label>
+            <input type="range" id="mutationStrengthSlider" min="10" max="100" value="40" style="flex: 2;">
+            <span id="mutationStrengthVal" class="slider-val">40%</span>
+          </div>
+          <div class="mutator-buttons">
+            <button id="mutateMaterialBtn" class="btn-mutate">🧪 Mutate Material</button>
+            <button id="mutateStyleBtn" class="btn-mutate">⚡ Mutate Style</button>
+            <button id="mutateScaleBtn" class="btn-mutate">📐 Mutate Scale</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seeded Randomizer & Chaos Engine Section -->
+      <div class="panel">
+        <h2 class="panel-title">3.5 RANDOMIZER ENGINE <span class="sub-label">Seeded & Chaos Randomization</span></h2>
+        <div class="randomizer-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="randomProfileSelect">Random Profile</label>
+            <select id="randomProfileSelect" style="width: 100%; box-sizing: border-box;">
+              <option value="orbitalRefinery">Industrial & Refinery</option>
+              <option value="powerArmor">Characters & Armor</option>
+              <option value="creature">Creatures & Monsters</option>
+              <option value="weapons">Weapons & Relics</option>
+              <option value="robotics">Robotics & Swarms</option>
+              <option value="megastructures">Megastructures & Space</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="randomTriangleCap">Triangle Cap</label>
+            <select id="randomTriangleCap" style="width: 100%; box-sizing: border-box;">
+              <option value="500">500 Tris</option>
+              <option value="1000">1000 Tris</option>
+              <option value="2000">2000 Tris</option>
+              <option value="5000">5000 Tris</option>
+              <option value="10000" selected>10000 Tris</option>
+              <option value="15000">15000 Tris</option>
+              <option value="20000">20000 Tris</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="chaosSelect">Chaos Level</label>
+            <select id="chaosSelect" style="width: 100%; box-sizing: border-box;">
+              <option value="safe" selected>Safe (No Drift)</option>
+              <option value="balanced">Balanced Drift</option>
+              <option value="wild">Wild Drift</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="seedInput">Custom Seed</label>
+            <input type="text" id="seedInput" placeholder="e.g. tripo" style="background: rgba(5,8,16,0.8); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.25rem 0.5rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem; width: 100%; box-sizing: border-box;">
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; justify-content: space-between; align-items: center;">
+          <button id="randomPromptButton" class="btn btn-primary" style="flex: 1;">🎲 Generate Random</button>
+          <button id="rerollButton" class="btn btn-secondary">🔄 Reroll</button>
+        </div>
+        
+        <!-- Share code output -->
+        <div id="recipeShareContainer" style="margin-top: 0.75rem; display: none;">
+          <label style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Recipe Share Code</label>
+          <div style="display: flex; gap: 0.25rem; margin-top: 0.2rem;">
+            <input type="text" id="shareCodeOutput" readonly style="flex: 1; background: rgba(5,8,16,0.9); border: 1px solid var(--border-color); color: var(--neon-cyan); padding: 0.25rem; font-family: var(--font-mono); font-size: 0.65rem; border-radius: 4px;">
+            <button id="copyShareCodeBtn" class="btn btn-discovery" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Copy</button>
+          </div>
+        </div>
+
+        <!-- Import share code -->
+        <div style="margin-top: 0.5rem; border-top: 1px dashed var(--border-color); padding-top: 0.5rem;">
+          <div style="display: flex; gap: 0.25rem; align-items: center;">
+            <input type="text" id="importShareCodeInput" placeholder="Paste Recipe Share Code..." style="flex: 1; background: rgba(5,8,16,0.8); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.25rem; font-family: var(--font-mono); font-size: 0.7rem; border-radius: 4px;">
+            <button id="importShareCodeBtn" class="btn btn-discovery" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Load Recipe</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plain English Explainer list -->
+      <div class="panel">
+        <h2 class="panel-title">4. TOKEN EXPLAINER <span class="sub-label">Plain-English roles</span></h2>
+        <div id="promptExplainerList" class="explainer-list-container"></div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT PANEL: ANALYTICS & VALIDATION -->
+    <section class="right-panel">
+
+      <!-- ROI Panel -->
+      <div class="panel">
+        <h2 class="panel-title">5. GEOMETRY ROI <span class="sub-label">Information Return</span></h2>
+        
+        <div class="roi-gauge-container">
+          <div class="svg-container">
+            <svg width="90" height="90">
+              <circle class="circle-bg" cx="45" cy="45" r="40"></circle>
+              <circle id="roiScoreCircle" class="circle-val" cx="45" cy="45" r="40" stroke="#00f0ff" stroke-width="8"></circle>
+            </svg>
+            <div class="roi-num">
+              <span id="roiScoreVal">90</span>
+              <span class="lbl">ROI</span>
+            </div>
+          </div>
+          
+          <div class="roi-details">
+            <label>High ROI Anchors</label>
+            <div id="highRoiList" class="badge-row"></div>
+            
+            <label>Drags & Warnings</label>
+            <div id="lowRoiList" class="badge-row"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Triangle Allocation Spend visualizer -->
+      <div class="panel">
+        <h2 class="panel-title">6. POLYGON ALLOCATION <span class="sub-label">Triangle Spend Visualizer</span></h2>
+        <div id="spendVisualizer" class="spend-visualizer-container"></div>
+      </div>
+
+      <!-- Benchmarking Panel -->
+      <div class="panel">
+        <h2 class="panel-title">7. BENCHMARKING <span class="sub-label">Geometry efficiency</span></h2>
+        <div class="benchmark-stats">
+          <div class="stat-card">
+            <label>Asset Grade</label>
+            <span id="benchmarkGrade" class="grade-badge grade-s">S</span>
+          </div>
+          <div class="stat-card">
+            <label>Tri-Efficiency</label>
+            <span id="triangleEfficiency" class="efficiency-badge efficiency-s">S</span>
+          </div>
+          <div class="stat-card">
+            <label>Complexity Score</label>
+            <span id="complexityScore" class="stat-value">6.8</span>
+          </div>
+          <div class="stat-card">
+            <label>Cost index</label>
+            <span id="costIndex" class="stat-value">12</span>
+          </div>
+          <div class="stat-card single-stat-wide">
+            <label>Target Budget</label>
+            <span id="recommendedCap" class="stat-value">5000 - 20000 Tris</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Why This Works explanation box -->
+      <div class="panel">
+        <h2 class="panel-title">8. WHY THIS WORKS <span class="sub-label">Aesthetic reasoning</span></h2>
+        <p id="whyThisWorksText" class="reasoning-text"></p>
+      </div>
+
+      <!-- Quality Gates Checklist -->
+      <div class="panel">
+        <h2 class="panel-title">9. QUALITY GATES <span class="sub-label">Validation checks</span></h2>
+        <div class="gates-grid">
+          <div id="gateG1" class="gate-item passed" data-name="Subject Clarity"></div>
+          <div id="gateG2" class="gate-item passed" data-name="Silhouette"></div>
+          <div id="gateG3" class="gate-item passed" data-name="Topology"></div>
+          <div id="gateG4" class="gate-item passed" data-name="Material"></div>
+          <div id="gateG5" class="gate-item passed" data-name="Detail Anchors"></div>
+          <div id="gateG6" class="gate-item passed" data-name="No Redundancy"></div>
+          <div id="gateG7" class="gate-item passed" data-name="Cap Matched"></div>
+          <div id="gateG8" class="gate-item passed" data-name="No Waste Words"></div>
+        </div>
+      </div>
+
+      <!-- Warning Panel -->
+      <div class="panel">
+        <h2 class="panel-title">10. WARNING PROTOCOL <span class="sub-label">Failure warnings</span></h2>
+        <div id="warningsList" class="warnings-container"></div>
+      </div>
+
+      <!-- History log & Favorites & Recommendations -->
+      <div class="panel">
+        <h2 class="panel-title">11. ADAPTIVE INSIGHTS <span class="sub-label">History learnings</span></h2>
+        <div id="recommendationsEl" style="margin-bottom: 0.75rem;"></div>
+        <label style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Prompt History Log</label>
+        <div id="historyList" class="history-list-container"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Diagnostics Panel -->
+  <section class="diagnostics-panel panel" style="margin: 1.5rem auto 0 auto; max-width: 100%;">
+    <h2 class="panel-title">12. DIAGNOSTICS <span class="sub-label">Event Audit & Connection Testing</span></h2>
+    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+      <button id="runConnectionTest" class="btn btn-discovery">Run Connection Test</button>
+      <button id="clearErrorLog" class="btn btn-discovery">Clear Errors</button>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div>
+        <h3 style="font-family: var(--font-title); font-size: 0.85rem; color: var(--neon-cyan); margin-bottom: 0.5rem; text-transform: uppercase;">Connection Results</h3>
+        <div id="connectionResults"></div>
+      </div>
+      <div>
+        <h3 style="font-family: var(--font-title); font-size: 0.85rem; color: var(--neon-cyan); margin-bottom: 0.5rem; text-transform: uppercase;">Event Audit Log</h3>
+        <div id="eventAudit" style="max-height: 200px; overflow-y: auto; background: rgba(5,8,16,0.4); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px;"></div>
+      </div>
+    </div>
+
+    <div id="errorToast"></div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

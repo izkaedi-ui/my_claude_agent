@@ -1,0 +1,34 @@
+# Model weights ? 4GB+ each, never commit
+*.gguf
+
+# ChromaDB binary store ? restorable from migration scripts
+swarm_memory/
+
+# Bounty sweeper extraction directory ? temporary downloads
+bounty_vortex/
+
+# Audit failure sidecar ? logs, not source
+audit_failures.jsonl
+
+# Forensic audit reports ? generated, not source
+_audit/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE noise
+.vscode/
+.idea/
+
+# Windows / macOS junk
+Thumbs.db
+.DS_Store
+
+# Scratch files
+*.bak
+*.tmp
+*.patched
+
+.git.backup-*/

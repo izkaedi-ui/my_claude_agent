@@ -1,0 +1,19 @@
+{
+  "name": "tripo-prompt-lab",
+  "version": "1.0.0",
+  "description": "Interactive GUI tool for generating Tripo 3D engine prompts based on triangle budgets.",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "npx -y serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "tripo",
+    "prompt-generator",
+    "3d-modeling"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
