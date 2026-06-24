@@ -1,0 +1,28 @@
+# Pre-install steps for GitHub Copilot coding agent sessions.
+# These run before the agent starts a task so the environment is ready.
+# Customize the steps below once the real toolchain is chosen.
+#
+# Docs: https://docs.github.com/en/copilot/how-tos/agents/copilot-coding-agent/customizing-the-development-environment-for-copilot-coding-agent
+
+name: Copilot Setup Steps
+
+on: workflow_dispatch
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Example for a Node.js project — uncomment and adjust when applicable:
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '20'
+      #     cache: 'npm'
+      # - name: Install dependencies
+      #   run: npm ci
+
+      - name: Placeholder
+        run: echo "Add real setup steps once the toolchain is defined."
